@@ -25,7 +25,7 @@ module.exports = {
     'GUILD_MEMBER_UPDATE': 'guildMemberUpdate',
     'GUILD_MEMBER_REMOVE': 'guildMemberLeave',
     'GUILD_MEMBER_CHUNK': 'guildMemberChunk',
-    'PRESENCE_UPDATE': 'guildMemberUpdate',
+    'PRESENCE_UPDATE': 'presenceUpdate',
     'VOICE_STATE_UPDATE': 'voiceStateUpdate',
     'VOICE_SERVER_UPDATE': 'voiceServerUpdate',
     'WEBHOOKS_UPDATE': 'webhookUpdate',

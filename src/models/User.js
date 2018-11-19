@@ -34,6 +34,10 @@ module.exports = class User extends Object {
         return this.username;
     }
 
+    get tag(){
+        return `<@${this.id}>`;
+    }
+
     avatarURLAs(format, size){
         if (!format){
             throw new Error("You need to give a format for the avatar url.");

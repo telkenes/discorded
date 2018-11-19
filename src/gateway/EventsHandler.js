@@ -6,6 +6,7 @@ const User = require("../models/User"),
     Channel = require("../models/TextChannel"),
     TextChannel = require("../models/TextChannel"),
     VoiceChannel = require("../models/VoiceChannel"),
+    Presence = require("../models/Presence"),
     CategoryChannel = require("../models/CategoryChannel");
 const Context = require("../models/Context");
 
@@ -111,6 +112,8 @@ module.exports = {
     },
 
     'presenceUpdate': async(client, d) => {
-        console.log(d);
+        // console.log(d);
+        // const presence = new Presence(d, client);
+        // console.log(presence);
     }
 }
