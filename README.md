@@ -6,5 +6,5 @@ There will be documentation soon.
 
 Check the example folder for an example bot.
 
-The absolute base for this library is forked from [nodeord](https://github.com/nodecord/nodecord).
+The absolute base for this library is forked from [nodecord](https://github.com/nodecord/nodecord).
 A node.js API wrapper for the Discord API.
