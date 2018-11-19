@@ -7,7 +7,7 @@ function getPrefix(client, message){
     return ["dc.", "dc "];
 }
 
-const client = new discorded.client(require("./config.json").token, getPrefix);
+const client = new discorded.client(require("./config.json").token);
 
 client.loadCommands(meta);
 
@@ -16,9 +16,9 @@ client.on("commandError", err => {
 });
 
 client.on("message", async(message) => {
-    // if (message.content === "dc.hello"){
-    //     message.channel.send(`Hello there ${message.author.tag}`);
-    // }
+    if (message.content === "dc.hello"){
+        message.channel.send(`Hello there ${message.author.tag}`);
+    }
 });
 
 client.on("ready", async() => {

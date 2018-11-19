@@ -83,13 +83,15 @@ class Client extends EventEmitter {
         /**
          * The session id.
          */
-        if (!options) options = {}
+        if (!options) options = {};
         if (typeof getPrefix === 'function'){
             this.getPrefix = getPrefix;
             /// Function that is used to get the prefix for commands.
             options.useCommandHandler = true;
         } else {
-            options = getPrefix;
+            if (typeof getPrefix === 'object'){
+                options = getPrefix;
+            }
             options.useCommandHandler = false;
         }
 
