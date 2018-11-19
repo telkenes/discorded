@@ -10,7 +10,7 @@ const User = require("../models/User"),
 const Context = require("../models/Context");
 
 module.exports = {
-    'ready': (client, d) => {
+    'ready': async(client, d) => {
         client.user = new User(d.d.user, client);
         client.sessionId = d.d.session_id;
 
@@ -23,7 +23,7 @@ module.exports = {
         client.emit('ready');
     },
 
-    'guildCreate': (client, d) => {
+    'guildCreate': async(client, d) => {
         let obj = d.d;
 
         let channels = new Store();
@@ -68,7 +68,7 @@ module.exports = {
         }
     },
 
-    'message': (client, d) => {
+    'message': async(client, d) => {
         const channel = client.channels.get(d.d.channel_id);
         let msg = channel.messages.get(d.d.id);
         if (msg) return;
@@ -85,7 +85,7 @@ module.exports = {
         }
     },
 
-    'messageEdit': (client, d) => {
+    'messageEdit': async(client, d) => {
         const channel = client.channels.get(d.d.channel_id);
         const guild = client.guilds.get(d.d.guild_id);
         let oldMsg = channel.messages.get(d.d.id);
@@ -110,7 +110,7 @@ module.exports = {
         channel.messages.set(d.d.id, newMsg)
     },
 
-    'channelCreate': (client, d) => {
-
+    'presenceUpdate': async(client, d) => {
+        console.log(d);
     }
 }

@@ -10,9 +10,9 @@ module.exports = async (client) => {
 
     const socket = new ws(`${gatewayUrl}/?v=7&encoding=json`);
     client.ws.socket = socket;
-    socket.on('message', (incoming) => {
+    socket.on('message', async(incoming) => {
         const d = JSON.parse(incoming) || incoming;
-
+        console.log(d);
         switch(d.op) {
             case 10: /* hello */
                 client.ws.gateway.heartbeat = {
@@ -23,7 +23,7 @@ module.exports = async (client) => {
 
                 require('./heartbeat')(client);
 
-                socket.send(JSON.stringify({
+                await socket.send(JSON.stringify({
                     op: 2,
                     d: {
                         token: client.token,
@@ -55,7 +55,7 @@ module.exports = async (client) => {
                 }
                 let e = require('./EventsHandler')[Events[d.t]];
                 if (e) {
-                    e(client, d);
+                    await e(client, d);
                 }
                 break;
         }

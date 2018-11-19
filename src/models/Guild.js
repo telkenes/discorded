@@ -1,6 +1,9 @@
 const Store = require("../util/Store");
-const Object = require("./Object"), Role = require("./Role"), Emoji = require("./Emoji");
-const Activity = require("./Activity"), Presence = require("./Presence");
+const Object = require("./Object"),
+    Role = require("./Role"),
+    Emoji = require("./Emoji");
+const Activity = require("./Activity"),
+    Presence = require("./Presence");
 
 module.exports = class Guild extends Object {
     constructor(obj, client) {
@@ -18,7 +21,7 @@ module.exports = class Guild extends Object {
         this.afkTimeout = obj.afk_timeout;
         if (obj.embed_enabled) this.embed = obj.embed_enabled;
         if (obj.embed_channel_id) this.embedChannel = this.channels.get(obj.embed_channel_id);
-        switch(obj.verification_level){
+        switch (obj.verification_level) {
             case 0:
                 this.verificationLevel = null;
                 break;
@@ -35,7 +38,7 @@ module.exports = class Guild extends Object {
                 this.verificationLevel = "VERY HIGH";
                 break;
         }
-        switch (obj.default_message_notifications){
+        switch (obj.default_message_notifications) {
             case 0:
                 this.defaultMessageNotifications = 'ALL MESSAGES';
                 break;
@@ -43,7 +46,7 @@ module.exports = class Guild extends Object {
                 this.defaultMessageNotifications = 'ONLY MENTIONS';
                 break;
         }
-        switch (obj.explicit_content_filter){
+        switch (obj.explicit_content_filter) {
             case 0:
                 this.explicitFilter = 'DISABLED';
                 break;
@@ -55,11 +58,11 @@ module.exports = class Guild extends Object {
                 break;
         }
         this.emojis = new Store();
-        for(const emoji of obj.emojis){
-            this.emojis.set(emoji.id, new Emoji(emoji, client));
+        for (const emoji of obj.emojis) {
+            this.emojis.set(emoji.id, new Emoji(emoji, this, client));
         }
         this.features = obj.features;
-        switch (obj.mfa_level){
+        switch (obj.mfa_level) {
             case 0:
                 this.mfaLevel = 'NONE';
                 break;
@@ -68,9 +71,9 @@ module.exports = class Guild extends Object {
                 break;
         }
         if (obj.widget_enabled) this.widget = obj.widget_enabled;
-        if(obj.widget_channel_id) this.widgetChannelID = obj.widget_channel_id;
+        if (obj.widget_channel_id) this.widgetChannelID = obj.widget_channel_id;
         this.SystemChannelID = obj.system_channel_id;
-        if (obj.large){
+        if (obj.large) {
             this.large = obj.large;
         } else {
             this.large = false;
@@ -79,7 +82,7 @@ module.exports = class Guild extends Object {
         for (let presence of obj.presences) {
             presence = new Presence(presence, client);
             const user = client.users.get(presence.user.id);
-            if (presence.game){
+            if (presence.game) {
                 user.game = new Activity(presence.game);
             }
             user.activities = [];
