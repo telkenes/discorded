@@ -13,12 +13,15 @@ module.exports = [
     
     new discorded.Command("info", async(client, ctx) => {
         // const member = ctx.getMemberOrAuthor(ctx.argString);
-        const member = ctx.author;
-        let embed = new discorded.Embed()
-        .title("Info of " + member.name)
-        .field("ID", member.id)
-        .thumbnail(member.avatarURL);
-        ctx.send(embed);
+        ctx.guild.members.forEach(member => {
+            if (member.id === ctx.args[0]){
+                let embed = new discorded.Embed()
+                .title("Info of " + member.name)
+                .field("ID", member.id)
+                .thumbnail(member.avatarURL);
+                ctx.send(embed);
+            } 
+        })
     }),
     
     new discorded.Command("test", async(client, ctx) => {

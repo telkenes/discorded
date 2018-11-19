@@ -16,7 +16,9 @@ client.on("commandError", err => {
 });
 
 client.on("message", async(message) => {
-    console.log(message.content);
+    // if (message.content === "dc.hello"){
+    //     message.channel.send(`Hello there ${message.author.tag}`);
+    // }
 });
 
 client.on("ready", async() => {

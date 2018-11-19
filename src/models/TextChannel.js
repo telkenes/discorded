@@ -41,7 +41,7 @@ module.exports = class TextChannel extends Channel {
         if (payload.content && payload.content == '') throw new TypeError(`Message content cannot be empty`);
         if (payload.content && payload.content.split('').length > 2000) throw new TypeError(`Message content cannot be over 2000 characters`);
 
-        this.client.sendMessage(this.channel.id, payload);
+        this.client.sendMessage(this.id, payload);
     }
 
     /**

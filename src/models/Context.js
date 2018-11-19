@@ -90,6 +90,7 @@ module.exports = class Context{
      */
     getMemberOrAuthor(name) {
         if (name) {
+            console.log(this.guild.member.get(name));
             return this.message.mentions[0] ||
                 this.guild.members.get(name) ||
                 this.guild.members.find(member => member.name === name) ||

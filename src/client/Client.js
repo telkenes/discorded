@@ -83,12 +83,13 @@ class Client extends EventEmitter {
         /**
          * The session id.
          */
+        if (!options) options = {}
         if (typeof getPrefix === 'function'){
             this.getPrefix = getPrefix;
             /// Function that is used to get the prefix for commands.
+            options.useCommandHandler = true;
         } else {
             options = getPrefix;
-            if (!options) options = {}
             options.useCommandHandler = false;
         }
 
@@ -186,21 +187,15 @@ class Client extends EventEmitter {
      */
     async sendMessage(channelID, payload) {
         const channel = this.channels.get(channelID);
-        try {
-            const b = await this.p({
-                url: `${this.baseURL}/channels/${channelID}/messages`,
-                method: "POST",
-                headers: {
-                    "Authorization": `Bot ${this.token}`,
-                    'Content-Type': 'application/json'
-                },
-                data: payload
-            });
-        } catch (err) {
-            throw new Error(err);
-        }
-        
-        console.log(b.body);
+        const b = await this.p({
+            url: `${this.baseURL}/channels/${channelID}/messages`,
+            method: "POST",
+            headers: {
+                "Authorization": `Bot ${this.token}`,
+                'Content-Type': 'application/json'
+            },
+            data: payload
+        });
         return new Message(b.body, {
             guild: channel.guild,
             channel: channel
@@ -213,18 +208,18 @@ class Client extends EventEmitter {
      * @param {snowflake} messageID Message id
      */
     async deleteMessage(channelID, messageID) {
-            const b = await p({
-                url: `${this.baseURL}/channels/${channelID}/messages/${messageID}`,
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bot ${this.token}`,
-                    'Content-Type': 'application/json'
-                },
-                data: payload,
-                parse: "json"
-            });
+        const b = await p({
+            url: `${this.baseURL}/channels/${channelID}/messages/${messageID}`,
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bot ${this.token}`,
+                'Content-Type': 'application/json'
+            },
+            data: payload,
+            parse: "json"
+        });
 
-            return b.body;
+        return b.body;
     }
 
     /**
@@ -236,24 +231,20 @@ class Client extends EventEmitter {
      */
     async editMessage(channelID, messageID, payload) {
         const channel = this.channels.get(channelID);
-        try {
-            const b = await p({
-                url: `${this.baseURL}/channels/${channelID}/messages/${messageID}`,
-                method: "PATCH",
-                headers: {
-                    "Authorization": `Bot ${this.token}`,
-                    'Content-Type': 'application/json'
-                },
-                data: payload,
-                parse:'json'
-            });
-            return new Message(b.body, {
-                guild: channel.guild,
-                channel: channel
-            });
-        } catch (err) {
-            throw new Error(err);
-        }
+        const b = await p({
+            url: `${this.baseURL}/channels/${channelID}/messages/${messageID}`,
+            method: "PATCH",
+            headers: {
+                "Authorization": `Bot ${this.token}`,
+                'Content-Type': 'application/json'
+            },
+            data: payload,
+            parse:'json'
+        });
+        return new Message(b.body, {
+            guild: channel.guild,
+            channel: channel
+        });
     }
 
     /**
@@ -308,7 +299,6 @@ class Client extends EventEmitter {
             return this.emit("notNSFW", ctx);
         }
         ctx.command = command;
-        console.log(ctx.message.content);
         ctx.argString = ctx.message.content.slice(prefix.length + command.name.length);
         ctx.args = ctx.argString.split(" ");
         ctx.args.shift();
