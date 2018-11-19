@@ -7,6 +7,7 @@ module.exports = class User extends Object {
         this.id = obj.id;
         if (obj.username) this.username = obj.username;
         if (obj.discriminator) this.discriminator = obj.discriminator;
+        if (obj.username && obj.discriminator) this.tag = `${obj.username}#${obj.discriminator}`
         if (obj.avatar) this.avatar = obj.avatar;
         if (obj.bot) {
             this.bot = obj.bot;
@@ -32,10 +33,6 @@ module.exports = class User extends Object {
 
     get name(){
         return this.username;
-    }
-
-    get tag(){
-        return `${this.username}#${this.tag}`;
     }
 
     avatarURLAs(format, size){
