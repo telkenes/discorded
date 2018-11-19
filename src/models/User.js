@@ -35,7 +35,7 @@ module.exports = class User extends Object {
     }
 
     get tag(){
-        return `<@${this.id}>`;
+        return `${this.username}#${this.tag}`;
     }
 
     avatarURLAs(format, size){
