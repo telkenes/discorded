@@ -5,5 +5,5 @@ module.exports = {
     client : require('./client/Client'),
     Embed : require("./util/Message/Embed"),
     Command : require("./models/Command"),
-    version : '0.0.2dev'
+    version : '0.0.1dev'
 };
