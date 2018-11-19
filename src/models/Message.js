@@ -1,6 +1,7 @@
 const Object = require("./Object");
 const MessageUtil = require('../util/Message/MessageUtil');
-const User = require("./User"), Member = require("./Member");
+const User = require("./User"),
+    Member = require("./Member");
 const p = require("phin").promisified;
 
 module.exports = class Message extends Object {
@@ -15,18 +16,20 @@ module.exports = class Message extends Object {
         this.tts = obj.tts;
         this.pinned = obj.pinned;
         this.mentions = [];
-        if (obj.mentions){
-            for (let mention of obj.mentions){
+        if (obj.mentions) {
+            for (let mention of obj.mentions) {
                 this.mentions.push(this.guild.members.get(mention.id));
             }
         }
         this.channelMentions = [];
-        const channelMatches = this.content.match(/<#\d*>/g);
-        if (channelMatches){
-            for (let match of channelMatches) {
-                match = match.replace("<#", "");
-                match = match.replace(">", "");
-                this.channelMentions.push(this.guild.channels.get(match));
+        if (this.content) {
+            const channelMatches = this.content.match(/<#\d*>/g);
+            if (channelMatches) {
+                for (let match of channelMatches) {
+                    match = match.replace("<#", "");
+                    match = match.replace(">", "");
+                    this.channelMentions.push(this.guild.channels.get(match));
+                }
             }
         }
         this.attachments = obj.attachments;
@@ -35,7 +38,7 @@ module.exports = class Message extends Object {
         if (obj.webhook_id) {
             this.author = obj.webhook_id;
         } else {
-            if (this.member){
+            if (this.member) {
                 this.author = new Member(obj.author, obj.member, this.guild, client);
             } else {
                 this.author = new User(obj.author, client);
@@ -72,7 +75,7 @@ module.exports = class Message extends Object {
         if (options) {
             if (options.embed && typeof (options.embed) == 'object') payload.embed = options.embed || null;
         }
-        
+
         if (payload.content && payload.content.split('').length > 2000) throw new TypeError(`Message content cannot be over 2000 characters`);
         this.client.editMessage(this.channel.id, this.id, payload);
     }

@@ -4,22 +4,26 @@ const User = require("../models/User"),
     Message = require("../models/Message"),
     TextChannel = require("../models/TextChannel"),
     Guild = require("../models/Guild");
-const p = require('phin').promisified;
+const p = require('phin');
 
-module.exports = class Client extends EventEmitter {
+class Client extends EventEmitter {
     /**
      * Represents a discord user/bot
-     * @todo hmm
+     * @todo Make it so that you can use it without using the command handler
      * @param {function} getPrefix This is used to get the prefix for the built in command handler. It passes the client and the message as arguments.
      * @param {string} token The token used for authentication.
      * @param {object} options Other options
      */
-    constructor(getPrefix, token, options) {
+    constructor(token, getPrefix, options) {
         super();
         this.baseURL = "https://discordapp.com/api";
         /**
          * Base url for discord api.
          */
+
+        this.p = p.defaults({
+            parse: 'json'
+        });
 
         this.guilds = new Store();
         /**
@@ -79,11 +83,13 @@ module.exports = class Client extends EventEmitter {
         /**
          * The session id.
          */
-
-        this.getPrefix = getPrefix;
-        /**
-         * Function that is used to get the prefix for commands.
-         */
+        if (typeof getPrefix === 'function'){
+            this.getPrefix = getPrefix;
+            /// Function that is used to get the prefix for commands.
+        } else {
+            options = getPrefix;
+            options.useCommandHandler = false;
+        }
 
         if (options && options.allowBots == true) {
             this.allowBots = true;
@@ -97,6 +103,12 @@ module.exports = class Client extends EventEmitter {
             console.warn("Now allowed to respond to myself. This can end up in a message loop.");
         } else {
             this.selfReply = false;
+        }
+
+        if (options && options.useCommandHandler == true){
+            this.useCommandHandler = true;
+        } else {
+            this.useCommandHandler = false;
         }
 
         if (options && options.connect == false) {
@@ -122,7 +134,7 @@ module.exports = class Client extends EventEmitter {
      */
     async getUser(id) {
         try {
-            const b = await p({
+            const b = await this.p({
                 url: `${this.baseURL}/users/${id}`,
                 method: 'GET',
                 headers: {
@@ -130,7 +142,7 @@ module.exports = class Client extends EventEmitter {
                     'Content-Type': 'application/json'
                 }
             });
-            return new User(JSON.parse(b.body), this);
+            return new User(b.body, this);
         } catch (err) {
             throw new Error(err);
         }
@@ -174,7 +186,7 @@ module.exports = class Client extends EventEmitter {
     async sendMessage(channelID, payload) {
         const channel = this.channels.get(channelID);
         try {
-            const b = await p({
+            const b = await this.p({
                 url: `${this.baseURL}/channels/${channelID}/messages`,
                 method: "POST",
                 headers: {
@@ -183,13 +195,15 @@ module.exports = class Client extends EventEmitter {
                 },
                 data: payload
             });
-            return new Message(JSON.parse(b.body), {
-                guild: channel.guild,
-                channel: channel
-            }, this);
         } catch (err) {
             throw new Error(err);
         }
+        
+        console.log(b.body);
+        return new Message(b.body, {
+            guild: channel.guild,
+            channel: channel
+        }, this);
     }
 
     /**
@@ -198,7 +212,6 @@ module.exports = class Client extends EventEmitter {
      * @param {snowflake} messageID Message id
      */
     async deleteMessage(channelID, messageID) {
-        try {
             const b = await p({
                 url: `${this.baseURL}/channels/${channelID}/messages/${messageID}`,
                 method: 'DELETE',
@@ -206,13 +219,11 @@ module.exports = class Client extends EventEmitter {
                     'Authorization': `Bot ${this.token}`,
                     'Content-Type': 'application/json'
                 },
-                data: payload
+                data: payload,
+                parse: "json"
             });
 
-            return JSON.parse(b.body);
-        } catch (err) {
-            throw new Error(err);
-        }
+            return b.body;
     }
 
     /**
@@ -232,15 +243,35 @@ module.exports = class Client extends EventEmitter {
                     "Authorization": `Bot ${this.token}`,
                     'Content-Type': 'application/json'
                 },
-                data: payload
+                data: payload,
+                parse:'json'
             });
-            return new Message(JSON.parse(b.body), {
+            return new Message(b.body, {
                 guild: channel.guild,
                 channel: channel
             });
         } catch (err) {
             throw new Error(err);
         }
+    }
+
+    /**
+     * This converts the channel to JSON and sends the current options to the api.
+     * @param {Channel} channel The channel to edit.
+     * @returns {Channel} The channel that was edited.
+     */
+    async editChannel(channel) {
+            const b = await p({
+                url: `${this.baseURL}/channels/${channel.id}`,
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Bot ${this.token}`,
+                    "Content-Type": "application/json"
+                },
+                data: channel.toJSON(),
+                parse:'json'
+            });
+            return channel;
     }
 
     /**
@@ -276,8 +307,10 @@ module.exports = class Client extends EventEmitter {
             return this.emit("notNSFW", ctx);
         }
         ctx.command = command;
+        console.log(ctx.message.content);
         ctx.argString = ctx.message.content.slice(prefix.length + command.name.length);
         ctx.args = ctx.argString.split(" ");
+        ctx.args.shift();
         this.emit('command', ctx);
         try {
             console.log("Processing command for " + ctx.author.toString())
@@ -287,3 +320,5 @@ module.exports = class Client extends EventEmitter {
         }
     }
 }
+
+module.exports = Client;

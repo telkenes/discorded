@@ -68,21 +68,6 @@ module.exports = class User extends Object {
 
         if (payload.content && payload.content == '') throw new TypeError(`Message content cannot be empty`);
         if (payload.content && payload.content.split('').length > 2000) throw new TypeError(`Message content cannot be over 2000 characters`);
-        console.log(this.client.token);
-        try {
-            const b = await p({
-                url: `https://discordapp.com/api/channels/${this.id}/messages`,
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bot ${this.client.token}`,
-                    'Content-Type': 'application/json'
-                },
-                data: payload
-            });
-    
-            return JSON.parse(b.body);
-        } catch(err) {
-            throw new Error(err);
-        }
+        return this.client.sendMessage(this.id, payload);
     }
 }

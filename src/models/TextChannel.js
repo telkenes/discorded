@@ -43,4 +43,34 @@ module.exports = class TextChannel extends Channel {
 
         this.client.sendMessage(this.channel.id, payload);
     }
+
+    /**
+     * Returns the channel as json object and ready to send to the channel edit api.
+     */
+    toJSON() {
+        let overwrites = [];
+        if (this.permissionOverwrites){
+            for (const overwrite of this.permissionOverwrites){
+                overwrites.push(overwrite.toJSON());
+            }
+        }
+        let obj = JSON.stringify({
+            name: this.name,
+            position: this.position,
+            topic: this.topic,
+            nsfw: this.nsfw,
+            rate_limit_per_user: this.rateLimitPerUser,
+            permission_overwrites: overwrites,
+        });
+        if (this.parent) obj.parent_id = this.parent.id;
+        return obj;
+    }
+
+    /**
+     * Edits the channel, you need to first change the properties with for example channel.name
+     * Because if you don't, nothing changes.
+     */
+    async edit() {
+        this.client.editChannel(this);
+    }
 }

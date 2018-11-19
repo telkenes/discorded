@@ -1,12 +1,13 @@
-const  Object = require("./Object");
+const Object = require("./Object");
 const TextChannel = require("./TextChannel");
 const Guild = require("./Guild");
+const p = require("phin").promisified;
 
 /**
  * A channel, this can be a {@link TextChannel}, dm, voice, group or a category channel.
  * @extends Object
  */
-module.exports = class Channel extends Object {
+class Channel extends Object {
     constructor(obj, client) {
         super(obj.id, client);
         this.type = obj.type;
@@ -18,16 +19,12 @@ module.exports = class Channel extends Object {
          * * Group
          * * Category
          */
-        
+
         if (obj.guild_id) this.guild = client.guilds.get(obj.guild_id);
-        /**
-         * The {@link Guild} that this channel is in.
-         */
+        /// The Guild that this channel is in.
 
         if (obj.position) this.position = obj.position;
-        /**
-         * The position of this channel.
-         */
+        /// The position of this channel.
 
         if (obj.permission_overwrites) this.permissionOverwrites = obj.permission_overwrites;
         /**
@@ -43,7 +40,7 @@ module.exports = class Channel extends Object {
         /**
          * 
          */
-        if (obj.nsfw && obj.nsfw === true){
+        if (obj.nsfw && obj.nsfw === true) {
             this.nsfw = obj.nsfw;
         } else {
             this.nsfw = false;
@@ -54,7 +51,7 @@ module.exports = class Channel extends Object {
         if (obj.rate_limit_per_user) this.rateLimitPerUser = obj.rate_limit_per_user;
         if (obj.recipients) {
             this.recipients = [];
-            for (user of obj.recipients){
+            for (user of obj.recipients) {
                 this.recipients.push(client.users.get(user))
             }
         }
@@ -64,12 +61,24 @@ module.exports = class Channel extends Object {
         if (obj.parent_id) this.parent = client.channels.get(obj.parent_id);
         if (obj.last_pin_timestamp) this.lastPinTimestamp = obj.last_pin_timestamp;
 
-        switch(this.type) {
-            case 0: this.type = 'text'; break;
-            case 1: this.type = 'dm'; break;
-            case 2: this.type = 'voice'; break;
-            case 3: this.type = 'group'; break;
-            case 4: this.type = 'category'; break;
+        switch (this.type) {
+            case 0:
+                this.type = 'text';
+                break;
+            case 1:
+                this.type = 'dm';
+                break;
+            case 2:
+                this.type = 'voice';
+                break;
+            case 3:
+                this.type = 'group';
+                break;
+            case 4:
+                this.type = 'category';
+                break;
         }
     }
 }
+
+module.exports = Channel;
