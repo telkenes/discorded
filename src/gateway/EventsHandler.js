@@ -78,9 +78,8 @@ module.exports = {
             channel: channel
         }, client);
         channel.messages.set(msg.id, msg);
+        client.emit('message', msg);
         let ctx = new Context(msg, client);
-
-        client.emit('message', ctx);
         if (client.useCommandHandler){
             client.processCommands(ctx);
         }

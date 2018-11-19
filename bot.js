@@ -9,11 +9,14 @@ function getPrefix(client, message){
 
 const client = new discorded.client(require("./config.json").token, getPrefix);
 
-
 client.loadCommands(meta);
 
 client.on("commandError", err => {
     ctx.send("There was an error, try again later.");
+});
+
+client.on("message", async(message) => {
+    console.log(message.content);
 });
 
 client.on("ready", async() => {
