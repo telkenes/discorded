@@ -107,12 +107,12 @@ module.exports = {
                 newMsg.mentions.push(guild.members.get(mention.id));
             }
         }
-        channel.messages.set(d.d.id, newMsg)
+        channel.messages.set(d.d.id, newMsg);
+        client.emit("messageEdit", oldMsg, newMsg);
     },
 
     'presenceUpdate': async(client, d) => {
-        // console.log(d);
-        // const presence = new Presence(d, client);
-        // console.log(presence);
+        const presence = new Presence(d.d, client);
+        client.emit("presenceUpdate", presence);
     }
 }

@@ -7,7 +7,7 @@ function getPrefix(client, message){
     return ["dc.", "dc "];
 }
 
-const client = new discorded.client(require("./config.json").token);
+const client = new discorded.Client(require("./config.json").token, getPrefix);
 
 client.loadCommands(meta);
 

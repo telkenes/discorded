@@ -1,13 +1,36 @@
-const Object = require("./Object");
 const MessageUtil = require('../util/Message/MessageUtil');
-const User = require("./User"),
+const Object = require("./Object"),
+    User = require("./User"),
     Member = require("./Member");
-const p = require("phin").promisified;
 
 module.exports = class Message extends Object {
     constructor(obj, addons, client) {
         super(obj.id, client);
-        this.guild = addons.guild;
+        if (addons.guild){
+            this.guild = addons.guild;
+            this.channelMentions = [];
+            if (this.content) {
+                const channelMatches = this.content.match(/<#\d*>/g);
+                if (channelMatches) {
+                    for (let match of channelMatches) {
+                        match = match.replace("<#", "");
+                        match = match.replace(">", "");
+                        this.channelMentions.push(this.guild.channels.get(match));
+                    }
+                }
+            }
+            if (obj.webhook_id) {
+                this.author = obj.webhook_id;
+            } else {
+                this.author = this.guild.members.get(obj.author.id);
+            }
+        } else {
+            if (obj.webhook_id) {
+                this.author = obj.webhook_id;
+            } else {
+                this.author = this.client.users.get(obj.author.id);
+            }
+        }
         this.channel = addons.channel;
         this.content = obj.content;
         this.cleaned = MessageUtil.cleanMessage(obj.content);
@@ -21,29 +44,9 @@ module.exports = class Message extends Object {
                 this.mentions.push(this.guild.members.get(mention.id));
             }
         }
-        this.channelMentions = [];
-        if (this.content) {
-            const channelMatches = this.content.match(/<#\d*>/g);
-            if (channelMatches) {
-                for (let match of channelMatches) {
-                    match = match.replace("<#", "");
-                    match = match.replace(">", "");
-                    this.channelMentions.push(this.guild.channels.get(match));
-                }
-            }
-        }
         this.attachments = obj.attachments;
         this.embeds = obj.embeds;
         this.reactions = obj.reactions;
-        if (obj.webhook_id) {
-            this.author = obj.webhook_id;
-        } else {
-            if (this.member) {
-                this.author = new Member(obj.author, obj.member, this.guild, client);
-            } else {
-                this.author = new User(obj.author, client);
-            }
-        }
     }
 
     async delete(timeout) {

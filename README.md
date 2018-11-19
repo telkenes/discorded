@@ -1,4 +1,4 @@
-# discorded
+# Discorded
 [![Discord](https://discordapp.com/api/guilds/513688996816224257/embed.png?style=shield)](https://discord.gg/jFpTgs4)  
 
 This library has built in command handler.

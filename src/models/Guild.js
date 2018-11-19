@@ -11,10 +11,12 @@ module.exports = class Guild extends Object {
         this.name = obj.name;
         this.icon = obj.icon;
         this.splash = obj.splash;
-        this.roles = new Store;
-        for (const role of obj.roles) {
-            this.roles.set(role.id, new Role(role, client));
+        this.roles = new Store();
+        for (let role of obj.roles) {
+            role = new Role(role, client);
+            this.roles.set(role.id, role);
         }
+        console.log(this.roles.map(role => role.mention));
         this.channels = obj.channels;
         this.regios = obj.region;
         if (obj.afk_channel_id) this.afkChannel = this.channels.get(obj.afk_channel_id);

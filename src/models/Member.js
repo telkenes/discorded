@@ -1,5 +1,6 @@
 const Store = require("../util/Store");
-const User = require("./User");
+const User = require("./User"),
+    Ban = require("./Ban");
 
 module.exports = class Member extends User {
     constructor(user, member, guild, client) {
@@ -7,8 +8,10 @@ module.exports = class Member extends User {
         this.guild = guild;
         if (member.nick) this.nick = member.nick;
         this.roles = new Store();
-        for (const role of member.roles){
-            this.roles.set(role.id, this.guild.roles.get(role));
+        for (let role of member.roles){
+            role = this.guild.roles.get(role);
+            console.log(role.name);
+            this.roles.set(role.id, role);
         }
         this.joinedAt = member.joined_at;
         this.deaf = member.deaf;
@@ -27,6 +30,51 @@ module.exports = class Member extends User {
             return this.nick;
         } else {
             return this.username;
+        }
+    }
+
+    async ban(reason, deleteMessageDays){
+        if (!reason){
+            reason = '';
+        }
+        if (typeof reason !== 'string'){
+            reason = `${reason}`;
+        }
+        const b = await this.client.p({
+            url: `${this.client.baseURL}/guilds/${this.guild.id}/bans/${this.id}`,
+            method: "PUT",
+            headers: {
+                'Authorization': `Bot ${this.client.token}`,
+                'Content-Type': 'application/json'
+            },
+            data: {
+                reason: reason,
+                delete_message_days: deleteMessageDays
+            }
+        });
+        return new Ban(b.body);
+    }
+
+    async kick(reason){
+        if (!reason){
+            reason = '';
+        }
+        if (typeof reason !== 'string'){
+            reason = `${reason}`;
+        }
+        const b = await this.client.p({
+            url: `${this.client.baseURL}/guilds/${this.guild.id}/members/${this.id}`,
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bot ${this.client.token}`,
+                'Content-Type': 'application/json'
+            },
+            data: {
+                reason: reason
+            }
+        });
+        if (b.code === 204){
+            return true;
         }
     }
 }

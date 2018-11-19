@@ -1,12 +1,11 @@
 const Store = require("../util/Store");
 const Channel = require('./Channel');
 const Embed = require("../util/Message/Embed");
-
 /**
  * Represents a guild text channel.
  * @extends Channel
  */
-module.exports = class TextChannel extends Channel {
+class TextChannel extends Channel {
     constructor(obj, client) {
         super(obj, client);
         this.messages = new Store();
@@ -74,3 +73,5 @@ module.exports = class TextChannel extends Channel {
         this.client.editChannel(this);
     }
 }
+
+module.exports = TextChannel;

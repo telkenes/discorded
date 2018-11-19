@@ -7,7 +7,6 @@ module.exports = class User extends Object {
         this.id = obj.id;
         if (obj.username) this.username = obj.username;
         if (obj.discriminator) this.discriminator = obj.discriminator;
-        if (obj.username && obj.discriminator) this.tag = `${obj.username}#${obj.discriminator}`
         if (obj.avatar) this.avatar = obj.avatar;
         if (obj.bot) {
             this.bot = obj.bot;
@@ -24,6 +23,23 @@ module.exports = class User extends Object {
         return `${this.username}#${this.discriminator}`
     }
 
+    /**
+     * Returns the username and the discriminator
+     */
+    get tag(){
+        return `${this.username}#${this.discriminator}`
+    }
+
+    /**
+     * Returns the mention of the user. This can be used in messages or embeds.
+     */
+    get mention(){
+        return `<@${this.id}>`;
+    }
+
+    /**
+     * The avatar url of the user.
+     */
     get avatarURL() {
         if (this.avatar.startsWith("a_")) {
             return `https://cdn.discordapp.com/avatars/${this.id}/${this.avatar}.gif`;
@@ -31,10 +47,18 @@ module.exports = class User extends Object {
         return `https://cdn.discordapp.com/avatars/${this.id}/${this.avatar}.png`;
     }
 
+    /**
+     * The username of the user.
+     */
     get name(){
         return this.username;
     }
 
+    /**
+     * Returns the avatar url with custom format and size.
+     * @param {string} format Image format for the avatar
+     * @param {number} size Size of the image, defaults to 1024
+     */
     avatarURLAs(format, size){
         if (!format){
             throw new Error("You need to give a format for the avatar url.");
@@ -46,6 +70,11 @@ module.exports = class User extends Object {
         return `https://cdn.discordapp.com/avatars/${this.id}/${this.avatar}.${format}?size=${size}`;
     }
 
+    /**
+     * Sends a direct message to the user.
+     * @param {string|Embed} content The message to send.
+     * @param {object} extra Extra options.
+     */
     async send(content, extra) {
         const payload = {
             content: null,

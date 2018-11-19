@@ -1,7 +1,4 @@
 const Object = require("./Object");
-const TextChannel = require("./TextChannel");
-const Guild = require("./Guild");
-const p = require("phin").promisified;
 
 /**
  * A channel, this can be a {@link TextChannel}, dm, voice, group or a category channel.
@@ -51,7 +48,7 @@ class Channel extends Object {
         if (obj.rate_limit_per_user) this.rateLimitPerUser = obj.rate_limit_per_user;
         if (obj.recipients) {
             this.recipients = [];
-            for (user of obj.recipients) {
+            for (let user of obj.recipients) {
                 this.recipients.push(client.users.get(user))
             }
         }

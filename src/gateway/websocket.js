@@ -1,3 +1,4 @@
+// The base for the websocket connection and heartbeat managament is from nodecord.
 const ws = require('ws');
 const { getGatewayBot } = require('../util/Gateway');
 

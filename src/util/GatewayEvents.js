@@ -30,5 +30,5 @@ module.exports = {
     'VOICE_SERVER_UPDATE': 'voiceServerUpdate',
     'WEBHOOKS_UPDATE': 'webhookUpdate',
     'USER_UPDATE': 'userUpdate',
-    'TYPING_START': 'userTypingStart',
+    'TYPING_START': 'typingStart',
 }

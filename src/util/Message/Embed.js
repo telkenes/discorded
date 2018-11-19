@@ -16,6 +16,9 @@ class Embed {
      * @param {string} str Title
      */
     title(str) {
+        if (!typeof str === 'string'){
+            str = `${str}`;
+        }
         if (!str || str == '') throw new TypeError(`Message embed titles cannot be empty`);
         if (str.split('').length > 256) throw new TypeError(`Message embed titles cannot be over 256 characters`);
 
@@ -28,6 +31,9 @@ class Embed {
      * @param {string} str Description
      */
     description(str) {
+        if (typeof str !== 'string'){
+            str = `${str}`;
+        }
         if (!str || str == '') throw new TypeError(`Message embed descriptions cannot be empty`);
         if (str.split('').length > 2048) throw new TypeError(`Message embed descriptions cannot be over 2048 characters`);
 

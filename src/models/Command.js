@@ -1,4 +1,10 @@
-module.exports = class Command {
+class Command {
+    /**
+     * A command for the built in command handler.
+     * @param {string} name The command name that it will be invoked with.
+     * @param {function} func The function that will be called, the arguments that will be passed are client and ctx {@link Context}
+     * @param {object} options Other options like help, args, nsfw, ownerOnly, and checks. Checks must be a list and they must take one argument, ctx. Checks will be called when the command is executed.
+     */
     constructor(name, func, options){
         this.name = name;
         this.run = func;
@@ -36,3 +42,4 @@ module.exports = class Command {
         }
     }
 }
+module.exports = Command;

@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 const Store = require('../util/Store');
 const User = require("../models/User"),
     Message = require("../models/Message"),
-    TextChannel = require("../models/TextChannel"),
+    DMChannel = require("../models/DMChannel"),
     Guild = require("../models/Guild");
 const p = require('phin');
 
@@ -24,6 +24,7 @@ class Client extends EventEmitter {
         this.p = p.defaults({
             parse: 'json'
         });
+        /// This is for phin defaults.
 
         this.guilds = new Store();
         /**
@@ -36,9 +37,6 @@ class Client extends EventEmitter {
          */
 
         this.channels = new Store();
-        /**
-         * All the {@link TextChannel}s the bot can see.
-         */
 
         this.commands = new Store();
         /**
@@ -188,9 +186,24 @@ class Client extends EventEmitter {
      * @returns {Message} The message that was sent.
      */
     async sendMessage(channelID, payload) {
-        const channel = this.channels.get(channelID);
+        let channel = this.channels.get(channelID);
+        if (!channel){
+            const b = await this.p({
+                url: `${this.baseURL}/users/@me/channels`,
+                method:"POST",
+                headers:{
+                    "Authorization": `Bot ${this.token}`,
+                    "Content-Type": "application/json"
+                },
+                data: JSON.stringify({
+                    recipient_id: channelID
+                })
+            });
+            channel = new DMChannel(b.body, this);
+            this.channels.set(channel.id, channel);
+        }
         const b = await this.p({
-            url: `${this.baseURL}/channels/${channelID}/messages`,
+            url: `${this.baseURL}/channels/${channel.id}/messages`,
             method: "POST",
             headers: {
                 "Authorization": `Bot ${this.token}`,
@@ -198,10 +211,16 @@ class Client extends EventEmitter {
             },
             data: payload
         });
-        return new Message(b.body, {
-            guild: channel.guild,
-            channel: channel
-        }, this);
+        if (channel.guild){
+            return new Message(b.body, {
+                guild: channel.guild,
+                channel: channel
+            }, this);
+        } else {
+            return new Message(b.body, {
+                channel: channel
+            }, this);
+        }
     }
 
     /**

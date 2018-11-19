@@ -8,10 +8,10 @@ module.exports = class Store extends Map {
      * @param {Function} callback The check to check with.
      */
     map(callback) {
-        let output = new Store();
+        let output = [];
         
         this.forEach((key, value) => {
-            output.set(value, callback(key, value));
+            output.push(callback(key, value));
         });
 
         return output;

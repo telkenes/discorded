@@ -28,5 +28,24 @@ module.exports = [
         ctx.send(ctx.guild.channels.map(channel => channel.type));
     }, {
         ownerOnly:true
+    }),
+
+    new discorded.Command("dm", async(client, ctx) => {
+        ctx.author.send("I have dmmed you.");
+    }),
+
+    new discorded.Command("eval", async(client, ctx) => {
+        ctx.send(eval(ctx.argString));
+    }, {
+        ownerOnly: true
+    }),
+
+    new discorded.Command("roles", async(client, ctx) => {
+        console.log(ctx.author.roles);
+        let embed = new discorded.Embed()
+            .title("Your roles.")
+            .description(ctx.author.roles.map(role => role.mention))
+            .thumbnail(ctx.author.avatarURL);
+            ctx.send(embed);
     })
 ]
