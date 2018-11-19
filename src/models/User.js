@@ -3,8 +3,7 @@ const p = require('phin').promisified;
 
 module.exports = class User extends Object {
     constructor(obj, client){
-        super(obj.id);
-        this.client = client;
+        super(obj.id, client);
         this.id = obj.id;
         if (obj.username) this.username = obj.username;
         if (obj.discriminator) this.discriminator = obj.discriminator;

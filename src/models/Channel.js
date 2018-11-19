@@ -1,14 +1,48 @@
 const  Object = require("./Object");
+const TextChannel = require("./TextChannel");
+const Guild = require("./Guild");
 
+/**
+ * A channel, this can be a {@link TextChannel}, dm, voice, group or a category channel.
+ * @extends Object
+ */
 module.exports = class Channel extends Object {
     constructor(obj, client) {
         super(obj.id, client);
         this.type = obj.type;
+        /**
+         * The type of the channel:
+         * * {@link TextChannel}
+         * * Direct
+         * * Voice
+         * * Group
+         * * Category
+         */
+        
         if (obj.guild_id) this.guild = client.guilds.get(obj.guild_id);
+        /**
+         * The {@link Guild} that this channel is in.
+         */
+
         if (obj.position) this.position = obj.position;
+        /**
+         * The position of this channel.
+         */
+
         if (obj.permission_overwrites) this.permissionOverwrites = obj.permission_overwrites;
+        /**
+         * Permission overwrites for the channel.
+         */
+
         if (obj.name) this.name = obj.name;
+        /**
+         * The name of the channel.
+         */
+
         if (obj.topic) this.topic = obj.topic;
+        /**
+         * 
+         */
         if (obj.nsfw && obj.nsfw === true){
             this.nsfw = obj.nsfw;
         } else {

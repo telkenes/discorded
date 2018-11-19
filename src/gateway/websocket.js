@@ -29,8 +29,8 @@ module.exports = async (client) => {
                         token: client.token,
                         properties: {
                             $os: process.platform,
-                            $browser: 'nodecord',
-                            $device: 'nodecord',
+                            $browser: 'discorded',
+                            $device: 'discorded',
                         },
                         compress: false,
                         large_threshold: 250,
@@ -53,7 +53,6 @@ module.exports = async (client) => {
                 if (d.t == 'READY') {
                     client.readyAt = Date.now();
                 }
-                
                 let e = require('./EventsHandler')[Events[d.t]];
                 if (e) {
                     e(client, d);

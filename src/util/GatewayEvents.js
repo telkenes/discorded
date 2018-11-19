@@ -1,7 +1,7 @@
 module.exports = {
     'READY': 'ready',
     'MESSAGE_CREATE': 'message',
-    'MESSAGE_UPDATE': 'messageUpdate',
+    'MESSAGE_UPDATE': 'messageEdit',
     'MESSAGE_DELETE': 'messageDelete',
     'MESSAGE_DELETE_BULK': 'messageBulkDelete',
     'MESSAGE_REACTION_ADD': 'messageReactionAdd',

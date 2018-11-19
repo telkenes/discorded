@@ -5,9 +5,16 @@ const colors = {
     'GREEN': '#00ff00',
 }
 
-module.exports = class MessageEmbed {
+/**
+ * Represents a Rich Embed.
+ */
+class Embed {
     constructor() { this.fields = []; }
 
+    /**
+     * Sets the title for the embed.
+     * @param {string} str Title
+     */
     title(str) {
         if (!str || str == '') throw new TypeError(`Message embed titles cannot be empty`);
         if (str.split('').length > 256) throw new TypeError(`Message embed titles cannot be over 256 characters`);
@@ -16,6 +23,10 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Sets the description for the embed.
+     * @param {string} str Description
+     */
     description(str) {
         if (!str || str == '') throw new TypeError(`Message embed descriptions cannot be empty`);
         if (str.split('').length > 2048) throw new TypeError(`Message embed descriptions cannot be over 2048 characters`);
@@ -24,6 +35,10 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Sets the color of the embed.
+     * @param {hex} color Hex value for the color.
+     */
     color(color) {
         if (!color || color.length == 0) throw new TypeError(`Message embed colors must be a hex code, integer, or predefined code`);
 
@@ -36,6 +51,10 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Sets the timestamp for the embed.
+     * @param {Date} date Date
+     */
     timestamp(date) {
         if (!date) {
             this.timestamp = new Date();
@@ -46,6 +65,12 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Adds a field to the embed.
+     * @param {string} name Name
+     * @param {string} value Value
+     * @param {boolean} inl Inline
+     */
     field(name, value, inl) {
         if (!name || name == '') throw new TypeError(`Message embed field names cannot be empty`);
         if (!value || value == '') throw new TypeError(`Message embed field values cannot be empty`);
@@ -61,6 +86,11 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Sets the author of the embed.
+     * @param {string} str Author
+     * @param {url} url URL
+     */
     author(str, url) {
         if (!str || str == '') throw new TypeError(`Message embed author name cannot be empty`);
         if (str.split('').length > 256) throw new TypeError(`Message embed author name cannot be over 256 characters`);
@@ -76,6 +106,11 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Sets the footer of the embed.
+     * @param {string} str Text
+     * @param {url} url URL
+     */
     footer(str, url) {
         if (!str || str == '') throw new TypeError(`Message embed footer text cannot be empty`);
         if (str.split('').length > 2048) throw new TypeError(`Message embed footer text cannot be over 2048 characters`);
@@ -91,6 +126,10 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Sets the image of the embed.
+     * @param {url} url URL
+     */
     image(url) {
         if (!url || url == '') throw new TypeError(`Message embed image URL is required`);
 
@@ -98,6 +137,10 @@ module.exports = class MessageEmbed {
         return this;
     }
 
+    /**
+     * Sets the thumbnail of the embed.
+     * @param {url} url URL
+     */
     thumbnail(url) {
         if (!url || url == '') throw new TypeError(`Message embed thumbnail URL is required`);
 
@@ -105,7 +148,10 @@ module.exports = class MessageEmbed {
         return this;
     }
 
-    pack() {
+    /**
+     * Returns the embed in json format and ready to send to the api.
+     */
+    toJSON() {
         let Embed = new Object();
 
         for (const [key, value] of Object.entries(this)) {
@@ -115,3 +161,5 @@ module.exports = class MessageEmbed {
         return Embed;
     }
 }
+
+module.exports = Embed;
