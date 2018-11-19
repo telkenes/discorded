@@ -88,6 +88,7 @@ class Client extends EventEmitter {
             /// Function that is used to get the prefix for commands.
         } else {
             options = getPrefix;
+            if (!options) options = {}
             options.useCommandHandler = false;
         }
 
