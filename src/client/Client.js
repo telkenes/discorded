@@ -3,7 +3,7 @@ const Store = require('../util/Store');
 const User = require("../models/User"),
     Message = require("../models/Message"),
     TextChannel = require("../models/TextChannel"),
-    Guild = require("./Guild");
+    Guild = require("../models/Guild");
 const p = require('phin').promisified;
 
 module.exports = class Client extends EventEmitter {

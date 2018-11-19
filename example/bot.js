@@ -1,4 +1,4 @@
-const discorded = require("./src/index");
+const discorded = require("../src/index");
 const meta = require("./commands/meta");
 
 console.log(`Discorded version ${discorded.version}`);
