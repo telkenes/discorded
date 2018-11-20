@@ -46,6 +46,9 @@ class Client extends EventEmitter {
         this.ws = {
             socket: null,
             connected: false,
+            reconnect: {
+                state:false
+            },
             gateway: {
                 url: null,
                 obtainedAt: null,
@@ -77,7 +80,7 @@ class Client extends EventEmitter {
          * The {@link User} of the bot.
          */
 
-        this.sessionId = null;
+        this.sessionID = null;
         /**
          * The session id.
          */

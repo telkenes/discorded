@@ -13,7 +13,7 @@ const Context = require("../models/Context");
 module.exports = {
     'ready': async(client, d) => {
         client.user = new User(d.d.user, client);
-        client.sessionId = d.d.session_id;
+        client.sessionID = d.d.session_id;
 
         for (const [obj] in d.d.guilds) {
             client.guilds.set(d.d.guilds[obj].id, {

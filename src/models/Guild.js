@@ -16,7 +16,6 @@ module.exports = class Guild extends Object {
             role = new Role(role, client);
             this.roles.set(role.id, role);
         }
-        console.log(this.roles.map(role => role.mention));
         this.channels = obj.channels;
         this.regios = obj.region;
         if (obj.afk_channel_id) this.afkChannel = this.channels.get(obj.afk_channel_id);
@@ -25,7 +24,7 @@ module.exports = class Guild extends Object {
         if (obj.embed_channel_id) this.embedChannel = this.channels.get(obj.embed_channel_id);
         switch (obj.verification_level) {
             case 0:
-                this.verificationLevel = null;
+                this.verificationLevel = 'NONE';
                 break;
             case 1:
                 this.verificationLevel = 'LOW';

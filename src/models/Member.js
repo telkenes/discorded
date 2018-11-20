@@ -1,6 +1,7 @@
 const Store = require("../util/Store");
 const User = require("./User"),
     Ban = require("./Ban");
+const Errors = require("../errors");
 
 module.exports = class Member extends User {
     constructor(user, member, guild, client) {
@@ -10,7 +11,6 @@ module.exports = class Member extends User {
         this.roles = new Store();
         for (let role of member.roles){
             role = this.guild.roles.get(role);
-            console.log(role.name);
             this.roles.set(role.id, role);
         }
         this.joinedAt = member.joined_at;
@@ -52,7 +52,11 @@ module.exports = class Member extends User {
                 delete_message_days: deleteMessageDays
             }
         });
-        return new Ban(b.body);
+        if (b.code === 204){
+            return new Ban(b.body);
+        } else {
+            throw new Errors.MissingPermissions("Missing permissions to kick this member.");
+        }
     }
 
     async kick(reason){
@@ -75,6 +79,8 @@ module.exports = class Member extends User {
         });
         if (b.code === 204){
             return true;
+        } else {
+            throw new Errors.MissingPermissions("Missing permissions to kick this member.");
         }
     }
 }

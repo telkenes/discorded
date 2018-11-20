@@ -3,6 +3,7 @@ const ws = require('ws');
 const { getGatewayBot } = require('../util/Gateway');
 
 module.exports = async (client) => {
+    console.log("Connecting...");
     const gatewayUrl = await getGatewayBot(client.token);
     client.ws.gateway = {
         url: gatewayUrl,
@@ -10,17 +11,20 @@ module.exports = async (client) => {
     };
 
     const socket = new ws(`${gatewayUrl}/?v=7&encoding=json`);
+    socket.id = Math.random();
     client.ws.socket = socket;
+
     socket.on('message', async(incoming) => {
         const d = JSON.parse(incoming) || incoming;
         // console.log(d);
         switch(d.op) {
             case 10: /* hello */
+                console.log("hello");
                 client.ws.gateway.heartbeat = {
                     interval: d.d.heartbeat_interval,
                     last: null,
                     recieved: true
-                };
+                }; 
 
                 require('./heartbeat')(client);
 
@@ -41,9 +45,20 @@ module.exports = async (client) => {
                         }
                     }
                 }));
+                if (client.ws.reconnect.state == true){
+                    console.log("Resumed");
+                    socket.send(JSON.stringify({
+                        token: client.token,
+                        session_id: client.ws.reconnect.sessionID,
+                        seq: client.ws.reconnect.seq
+                    }));
+                    client.ws.reconnect = { state: false };
+                    client.emit("resume");
+                }
                 break;
 
             case 11: /* heartbeak ack */
+                console.log("hb ack");
                 client.ws.gateway.heartbeat.last = Date.now();
                 client.ws.gateway.heartbeat.recieved = true;
                 break;
