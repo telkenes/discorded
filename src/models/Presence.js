@@ -1,5 +1,4 @@
-const Role = require("./Role"),
-    Activity = require("./Activity");
+const Activity = require("./Activity");
 const Store = require("../util/Store");
 
 module.exports = class Presence {
@@ -18,7 +17,7 @@ module.exports = class Presence {
             }
         }
         this.guild = client.guilds.get(obj.guild_id);
-        if (this.guild){
+        if (this.guild && this.guild.members){
             this.member = this.guild.members.get(this.user.id);
             this.member.nick = obj.nick;
             if (obj.roles){

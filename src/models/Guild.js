@@ -6,11 +6,17 @@ const Activity = require("./Activity"),
     Presence = require("./Presence");
 
 module.exports = class Guild extends Object {
-    constructor(obj, client) {
+    constructor(obj, client, bans) {
         super(obj.id, client);
         this.name = obj.name;
         this.icon = obj.icon;
         this.splash = obj.splash;
+        this.bans = new Store();
+        if (bans){
+            for (const ban in bans){
+                this.bans.set(ban.user.id, ban);
+            }
+        }
         this.roles = new Store();
         for (let role of obj.roles) {
             role = new Role(role, client);

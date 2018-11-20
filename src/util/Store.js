@@ -22,7 +22,8 @@ module.exports = class Store extends Map {
      * @param {Function} predicate The check to check with.
      */
     find(predicate){
-        this.forEach((key) => {
+        this.forEach(key => {
+            // console.log(key);
             if (predicate(key)){
                 return key;
             }

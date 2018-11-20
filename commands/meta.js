@@ -12,20 +12,21 @@ module.exports = [
     }),
     
     new discorded.Command("info", async(client, ctx) => {
-        // const member = ctx.getMemberOrAuthor(ctx.argString);
-        ctx.guild.members.forEach(member => {
-            if (member.id === ctx.args[0]){
-                let embed = new discorded.Embed()
-                .title("Info of " + member.name)
-                .field("ID", member.id)
-                .thumbnail(member.avatarURL);
-                ctx.send(embed);
-            } 
-        })
+        const member = ctx.getMember(ctx.argString) || ctx.author;
+        let embed = new discorded.Embed()
+            .field("ID", member.id)
+            .thumbnail(member.avatarURL)
+            .color(ctx.author.topRole.color);
+        if (member.nick){
+            embed.title(`Info of ${member.nick} aka (${member.username})`);
+        } else {
+            embed.title(`Info of ${member.name}`);
+        }
+        ctx.send(embed);
     }),
     
     new discorded.Command("test", async(client, ctx) => {
-        ctx.send(ctx.guild.channels.map(channel => channel.type));
+        ctx.send(`Your top role's color is ${ctx.author.topRole.color}`);
     }, {
         ownerOnly:true
     }),
@@ -35,17 +36,35 @@ module.exports = [
     }),
 
     new discorded.Command("eval", async(client, ctx) => {
-        ctx.send(eval(ctx.argString));
+        try {
+            ctx.send(eval(ctx.argString));
+        } catch (err) {
+            ctx.send(err);
+        }
     }, {
-        ownerOnly: true
+        checks: [
+            ctx => ctx.author.id === "464910064965386283",
+        ]
     }),
 
     new discorded.Command("roles", async(client, ctx) => {
-        console.log(ctx.author.roles);
+        let member = ctx.getMemberOrAuthor(ctx.argString);
+        if (!member.roles){
+            return ctx.send(`${member.name} doesn't have any roles.`);
+        }
         let embed = new discorded.Embed()
             .title("Your roles.")
-            .description(ctx.author.roles.map(role => role.mention))
-            .thumbnail(ctx.author.avatarURL);
-            ctx.send(embed);
-    })
+            .description(member.roles.map(role => role.mention).join(" "))
+            .thumbnail(member.avatarURL)
+            .color(member.topRole.color);
+        console.log(embed.toJSON());
+        ctx.send(embed);
+    }),
+
+    new discorded.Command("channels", async(client, ctx) => {
+        let embed = new discorded.Embed()
+            .title("Channels")
+            .description(ctx.guild.channels.map(channel => `<#${channel.id}>`).join("\n"));
+        ctx.send(embed);
+    }),
 ]

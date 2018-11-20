@@ -1,6 +1,6 @@
 {
   "name": "discorded",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A node.js API wrapper for the Discord API.",
   "main": "src/index.js",
   "directories": {
@@ -23,10 +23,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iWeeti/discorded"
+    "url": "https://github.com/telkenes/discorded"
   },
   "bugs": {
-    "url": "https://github.com/iWeeti/discorded/issues"
+    "url": "https://github.com/telkenes/discorded/issues"
   },
   "dependencies": {
     "events": "^3.0.0",

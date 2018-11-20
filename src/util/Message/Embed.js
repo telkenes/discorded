@@ -51,7 +51,7 @@ class Embed {
         if (!colors.hasOwnProperty(color)) {
             this.color = parseInt(/[0-9A-F]{6}/i.exec(color)[0], 16);
         } else {
-            this.color = this.color = parseInt(/[0-9A-F]{6}/i.exec(colors[color])[0], 16);
+            this.color = parseInt(/[0-9A-F]{6}/i.exec(colors[color])[0], 16);
         }
 
         return this;

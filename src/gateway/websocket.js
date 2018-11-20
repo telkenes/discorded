@@ -16,6 +16,7 @@ module.exports = async (client) => {
     });
 
     client.ws.socket.on('message', async(incoming) => {
+        const d = JSON.parse(incoming) || incoming;
         if(d.s){
             client.ws.gateway.seq = d.s;
         }

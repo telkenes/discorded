@@ -83,4 +83,18 @@ module.exports = class Member extends User {
             throw new Errors.MissingPermissions("Missing permissions to kick this member.");
         }
     }
+
+    get topRole(){
+        let topRole;
+        let roles = this.roles.map(role => role);
+        for (let role of roles){
+            if (!topRole){
+                topRole = role;
+            }
+            if (role.position > topRole && role.hoist){
+                topRole = role.position;
+            }
+        }
+        return topRole;
+    }
 }

@@ -3,16 +3,13 @@ const meta = require("./commands/meta");
 
 console.log(`Discorded version ${discorded.version}`);
 
-function getPrefix(client, message){
-    return ["dc.", "dc "];
-}
-
-const client = new discorded.Client(require("./config.json").token, getPrefix);
+const client = new discorded.Client(require("./config.json").token, (client, msg) => ["dc ", "dc."]);
 
 client.loadCommands(meta);
 
-client.on("commandError", err => {
+client.on("commandError", (ctx, err) => {
     ctx.send("There was an error, try again later.");
+    console.log(err);
 });
 
 client.on("message", async(message) => {
@@ -26,9 +23,13 @@ client.on("ready", async() => {
 });
 
 client.on("checkError", ctx => {
-    ctx.send("You do not have permissions to do that.");
+    ctx.send(`You do not have permissions to use ${ctx.command.name}.`);
 });
 
 client.on("notNSFW", ctx => {
     ctx.send("This command cna only be used in nsfw channels.");
+});
+
+client.on("notOwner", ctx => {
+    ctx.send(`The command ${ctx.command.name} is owner only command.`);
 });

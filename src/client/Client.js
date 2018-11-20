@@ -3,6 +3,7 @@ const Store = require('../util/Store');
 const User = require("../models/User"),
     Message = require("../models/Message"),
     DMChannel = require("../models/DMChannel"),
+    Command = require("../models/Command"),
     Guild = require("../models/Guild");
 const p = require('phin');
 
@@ -49,6 +50,21 @@ class Client extends EventEmitter {
          */
         this.commands = new Store();
 
+        this.commands.set("help", new Command("help", (client, ctx) => {
+            let commands = [];
+            this.commands.forEach(command => {
+                if (command.help){
+                    commands.push(`${command.name}\n   ${command.help}`);
+                } else {
+                    commands.push(`${command.name} - No help.`);
+                }
+            }, {
+                help: "Shows this message."
+            });
+            let format = commands.join("\n");
+            ctx.send("```\n" + format + "\n```");
+        }));
+
         /**
          * The websocket that is used to connect to the gateway.
          */
@@ -90,8 +106,14 @@ class Client extends EventEmitter {
          * The session id.
          */
         this.sessionID = null;
+
+        /**
+         * The owner of the bot.
+         */
+        this.owner = null;
+
         if (!options) options = {};
-        if (typeof getPrefix === 'function'){
+        if (typeof getPrefix === 'function' || typeof getPrefix === 'string' || getPrefix instanceof Array){
             /**
              * Function that is used to get the prefix for commands.
              */
@@ -141,6 +163,16 @@ class Client extends EventEmitter {
      * Connects to discord if not connected already.
      */
     connect() {
+        this.p({
+            url: `${this.baseURL}/oauth2/applications/@me`,
+            method:"GET",
+            headers: {
+                'Authorization': `Bot ${this.token}`,
+                'Content-Type': 'application/json'
+            }
+        }).then(b => {
+            this.owner = new User(b.body.owner, this);
+        });
         const attemptLogin = require('../gateway/websocket');
         if (this.ws.connected) throw new Error(`Client is already connected to the gateway`);
 
@@ -200,9 +232,10 @@ class Client extends EventEmitter {
      * Sends a message to a channel.
      * @param {snowflake} channelID A channel id.
      * @param {Object} payload Object to send.
+     * @param {Context} ctx This is optional.
      * @returns {Message} The message that was sent.
      */
-    async sendMessage(channelID, payload) {
+    async sendMessage(channelID, payload, ctx) {
         let channel = this.channels.get(channelID);
         if (!channel){
             const b = await this.p({
@@ -228,15 +261,21 @@ class Client extends EventEmitter {
             },
             data: payload
         });
-        if (channel.guild){
-            return new Message(b.body, {
-                guild: channel.guild,
-                channel: channel
-            }, this);
+        if (b.body.code){
+            if (ctx){
+                this.emit("commandError", ctx, b.body.message);
+            }
         } else {
-            return new Message(b.body, {
-                channel: channel
-            }, this);
+            if (channel.guild){
+                return new Message(b.body, {
+                    guild: channel.guild,
+                    channel: channel
+                }, this);
+            } else {
+                return new Message(b.body, {
+                    channel: channel
+                }, this);
+            }
         }
     }
 
@@ -310,7 +349,12 @@ class Client extends EventEmitter {
      */
     async processCommands(ctx) {
         if (ctx.author.id === this.user.id && !this.selfReply) return;
-        const prefixes = this.getPrefix(this, ctx.message);
+        let prefixes;
+        if (typeof this.getPrefix == 'function'){
+            prefixes = this.getPrefix(this, ctx.message);
+        } else {
+            prefixes = this.getPrefix;
+        }
         let prefix = null;
         if (typeof (prefixes) == 'string') {
             if (ctx.message.content.startsWith(prefixes)) prefix = prefixes;
@@ -326,6 +370,9 @@ class Client extends EventEmitter {
         if (ctx.author.bot && !this.allowBots) return;
         const command = this.commands.get(ctx.message.content.slice(prefix.length).split(" ")[0]);
         if (!command) return;
+        if (command.ownerOnly && ctx.author.id !== this.owner.id){
+            return this.emit("notOwner", ctx);
+        }
         if (command.checks) {
             for (const check of command.checks) {
                 if (!check(ctx)) {
@@ -337,7 +384,7 @@ class Client extends EventEmitter {
             return this.emit("notNSFW", ctx);
         }
         ctx.command = command;
-        ctx.argString = ctx.message.content.slice(prefix.length + command.name.length);
+        ctx.argString = ctx.message.content.slice(prefix.length + command.name.length + 1);
         ctx.args = ctx.argString.split(" ");
         ctx.args.shift();
         this.emit('command', ctx);
