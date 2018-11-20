@@ -4,6 +4,7 @@ const User = require("../models/User"),
     Message = require("../models/Message"),
     DMChannel = require("../models/DMChannel"),
     Command = require("../models/Command"),
+    Context = require("../models/Context"),
     Guild = require("../models/Guild");
 const p = require('phin');
 
@@ -11,7 +12,7 @@ class Client extends EventEmitter {
     /**
      * Represents a discord user/bot
      * @todo Make it so that you can use it without using the command handler
-     * @param {function} getPrefix This is used to get the prefix for the built in command handler. It passes the client and the message as arguments.
+     * @param {function|string|Array} getPrefix This is used to get the prefix for the built in command handler. It passes the client and the message as arguments.
      * @param {string} token The token used for authentication.
      * @param {object} options Other options
      */
@@ -177,6 +178,14 @@ class Client extends EventEmitter {
         if (this.ws.connected) throw new Error(`Client is already connected to the gateway`);
 
         attemptLogin(this);
+    }
+
+    /**
+     * Returns a context from the message;
+     * @param {Message} mesage 
+     */
+    getContext(message){
+        return new Context(message, this);
     }
 
     /**

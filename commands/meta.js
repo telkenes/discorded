@@ -25,26 +25,8 @@ module.exports = [
         ctx.send(embed);
     }),
     
-    new discorded.Command("test", async(client, ctx) => {
-        ctx.send(`Your top role's color is ${ctx.author.topRole.color}`);
-    }, {
-        ownerOnly:true
-    }),
-
     new discorded.Command("dm", async(client, ctx) => {
         ctx.author.send("I have dmmed you.");
-    }),
-
-    new discorded.Command("eval", async(client, ctx) => {
-        try {
-            ctx.send(eval(ctx.argString));
-        } catch (err) {
-            ctx.send(err);
-        }
-    }, {
-        checks: [
-            ctx => ctx.author.id === "464910064965386283",
-        ]
     }),
 
     new discorded.Command("roles", async(client, ctx) => {

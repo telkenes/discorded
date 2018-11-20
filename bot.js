@@ -8,7 +8,7 @@ const client = new discorded.Client(require("./config.json").token, (client, msg
 client.loadCommands(meta);
 
 client.on("commandError", (ctx, err) => {
-    ctx.send("There was an error, try again later.");
+    ctx.send("There was an error, try again later.\nError: " + err);
     console.log(err);
 });
 
