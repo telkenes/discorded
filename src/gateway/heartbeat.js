@@ -17,7 +17,6 @@ module.exports = async (client) => {
     const randomNum = Math.random();
     const heartbeatLoop = setInterval(() => {
         console.log("Heartbeat loop " + randomNum);
-        console.log(client.ws.socket);
         if (!client.ws.gateway.heartbeat.recieved){
             reconnect(client, heartbeatLoop);
         } else {
