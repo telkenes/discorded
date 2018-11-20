@@ -16,33 +16,42 @@ class Client extends EventEmitter {
      */
     constructor(token, getPrefix, options) {
         super();
-        this.baseURL = "https://discordapp.com/api";
+
         /**
          * Base url for discord api.
          */
-
+        this.baseURL = "https://discordapp.com/api";
+        
+        /**
+         * This is for phin defaults.
+         */
         this.p = p.defaults({
             parse: 'json'
         });
-        /// This is for phin defaults.
 
-        this.guilds = new Store();
         /**
-         * All the {@link User} s the bot is in.
+         * All the {@link Guild} s the bot is in.
          */
+        this.guilds = new Store();
 
-        this.users = new Store();
         /**
          * All the {@link User} s the bot can see.
          */
+        this.users = new Store();
 
+        /**
+         * All the channels the bot can see.
+         */
         this.channels = new Store();
 
-        this.commands = new Store();
         /**
          * The {@link Command}s that are loaded.
          */
+        this.commands = new Store();
 
+        /**
+         * The websocket that is used to connect to the gateway.
+         */
         this.ws = {
             socket: null,
             connected: false,
@@ -60,34 +69,33 @@ class Client extends EventEmitter {
                 }
             }
         };
-        /**
-         * The websocket connection.
-         */
 
-        this.token = token;
         /**
          * The bot token used for authentication.
          * *BE VERY CAREFUL WITH THIS, DON'T SHARE IT*
          */
+        this.token = token;
 
-        this.readyAt = 0;
         /**
          * The time when the bot was ready.
          */
+        this.readyAt = 0;
 
-        this.user = null;
         /**
          * The {@link User} of the bot.
          */
+        this.user = null;
 
-        this.sessionID = null;
         /**
          * The session id.
          */
+        this.sessionID = null;
         if (!options) options = {};
         if (typeof getPrefix === 'function'){
+            /**
+             * Function that is used to get the prefix for commands.
+             */
             this.getPrefix = getPrefix;
-            /// Function that is used to get the prefix for commands.
             options.useCommandHandler = true;
         } else {
             if (typeof getPrefix === 'object'){
@@ -97,6 +105,9 @@ class Client extends EventEmitter {
         }
 
         if (options && options.allowBots == true) {
+            /**
+             * This allows the bots to invoke the built in command handler.
+             */
             this.allowBots = true;
             console.warn("Now allowed to respond to other bots. This can end up in a message loop.");
         } else {
@@ -104,6 +115,9 @@ class Client extends EventEmitter {
         }
 
         if (options && options.selfReply == true) {
+            /**
+             * This means that the bot can reply to itself.
+             */
             this.selfReply = true;
             console.warn("Now allowed to respond to myself. This can end up in a message loop.");
         } else {

@@ -3,23 +3,37 @@ const ws = require('ws');
 const { getGatewayBot } = require('../util/Gateway');
 
 module.exports = async (client) => {
-    console.log("Connecting...");
     const gatewayUrl = await getGatewayBot(client.token);
     client.ws.gateway = {
         url: gatewayUrl,
         obtainedAt: Date.now()
     };
 
-    const socket = new ws(`${gatewayUrl}/?v=7&encoding=json`);
-    socket.id = Math.random();
-    client.ws.socket = socket;
+    client.ws.socket = new ws(`${gatewayUrl}/?v=7&encoding=json`);
 
-    socket.on('message', async(incoming) => {
-        const d = JSON.parse(incoming) || incoming;
-        // console.log(d);
+    client.ws.socket.on("close", (...args) => {
+        throw new Error(args[1]);
+    });
+
+    client.ws.socket.on('message', async(incoming) => {
+        if(d.s){
+            client.ws.gateway.seq = d.s;
+        }
         switch(d.op) {
+            case 1: // Heartbeat
+                socket.send(JSON.stringify({
+                    op: 1,
+                    d: 0
+                }));
+                break;
+
+            case 9: // Invalid session
+                if (d.d == false){
+                    throw new Error("Could not reconnect with the session id.");
+                }
+                break;
+
             case 10: /* hello */
-                console.log("hello");
                 client.ws.gateway.heartbeat = {
                     interval: d.d.heartbeat_interval,
                     last: null,
@@ -28,7 +42,7 @@ module.exports = async (client) => {
 
                 require('./heartbeat')(client);
 
-                await socket.send(JSON.stringify({
+                await client.ws.socket.send(JSON.stringify({
                     op: 2,
                     d: {
                         token: client.token,
@@ -45,20 +59,9 @@ module.exports = async (client) => {
                         }
                     }
                 }));
-                if (client.ws.reconnect.state == true){
-                    console.log("Resumed");
-                    socket.send(JSON.stringify({
-                        token: client.token,
-                        session_id: client.ws.reconnect.sessionID,
-                        seq: client.ws.reconnect.seq
-                    }));
-                    client.ws.reconnect = { state: false };
-                    client.emit("resume");
-                }
                 break;
 
             case 11: /* heartbeak ack */
-                console.log("hb ack");
                 client.ws.gateway.heartbeat.last = Date.now();
                 client.ws.gateway.heartbeat.recieved = true;
                 break;
@@ -68,6 +71,18 @@ module.exports = async (client) => {
 
                 if (d.t == 'READY') {
                     client.readyAt = Date.now();
+                    if (client.ws.reconnect.state == true){
+                        let obj = {
+                            op:6,
+                            d: {
+                                token: client.token,
+                                session_id: client.ws.reconnect.sessionID,
+                                seq: client.ws.reconnect.seq
+                            }
+                        };
+                        client.ws.socket.send(JSON.stringify(obj));
+                        client.ws.reconnect = { state: false };
+                    }
                 }
                 let e = require('./EventsHandler')[Events[d.t]];
                 if (e) {

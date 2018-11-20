@@ -24,6 +24,14 @@ module.exports = {
         client.emit('ready');
     },
 
+    'resumed': async(client, d) => {
+        client.emit("resume", d.d);
+    },
+
+    'invalidSession': async(client, d) => {
+        console.log(d);
+    },
+
     'guildCreate': async(client, d) => {
         let obj = d.d;
 
@@ -66,6 +74,23 @@ module.exports = {
         } else {
             client.guilds.set(d.d.id, guild);
             client.emit('guildCreate', guild);
+        }
+    },
+
+    'channelCreate': async(client, d) => {
+        let channel = d.d;
+        switch (channel.type) {
+            case 0:
+                channel = new TextChannel(channel, client);
+                
+                break;
+            case 2:
+                channel = new VoiceChannel(channel, client);
+                break;
+            case 4:
+                channel = new CategoryChannel(channel, client);
+            default:
+                channel = new Channel(channel, client);
         }
     },
 

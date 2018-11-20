@@ -31,4 +31,6 @@ module.exports = {
     'WEBHOOKS_UPDATE': 'webhookUpdate',
     'USER_UPDATE': 'userUpdate',
     'TYPING_START': 'typingStart',
+    'RESUMED': 'resumed',
+    'INVALID_SESSION': 'invalidSession'
 }
