@@ -1,19 +1,20 @@
-const Store = require("../util/Store");
-const Object = require("./Object"),
-    Role = require("./Role"),
-    Emoji = require("./Emoji");
-const Activity = require("./Activity"),
-    Presence = require("./Presence");
+const Store = require('../util/Store');
+const _Object = require('./Object'),
+    Role = require('./Role'),
+    Emoji = require('./Emoji');
+const Activity = require('./Activity'),
+    VerificationLevel = require('./VerificationLevel'),
+    Presence = require('./Presence');
 
-module.exports = class Guild extends Object {
+module.exports = class Guild extends _Object {
     constructor(obj, client, bans) {
         super(obj.id, client);
         this.name = obj.name;
         this.icon = obj.icon;
         this.splash = obj.splash;
         this.bans = new Store();
-        if (bans){
-            for (const ban in bans){
+        if (bans) {
+            for (const ban in bans) {
                 this.bans.set(ban.user.id, ban);
             }
         }
@@ -24,27 +25,13 @@ module.exports = class Guild extends Object {
         }
         this.channels = obj.channels;
         this.regios = obj.region;
-        if (obj.afk_channel_id) this.afkChannel = this.channels.get(obj.afk_channel_id);
+        if (obj.afk_channel_id)
+            this.afkChannel = this.channels.get(obj.afk_channel_id);
         this.afkTimeout = obj.afk_timeout;
         if (obj.embed_enabled) this.embed = obj.embed_enabled;
-        if (obj.embed_channel_id) this.embedChannel = this.channels.get(obj.embed_channel_id);
-        switch (obj.verification_level) {
-            case 0:
-                this.verificationLevel = 'NONE';
-                break;
-            case 1:
-                this.verificationLevel = 'LOW';
-                break;
-            case 2:
-                this.verificationLevel = "MEDIUM";
-                break;
-            case 3:
-                this.verificationLevel = "HIGH";
-                break;
-            case 4:
-                this.verificationLevel = "VERY HIGH";
-                break;
-        }
+        if (obj.embed_channel_id)
+            this.embedChannel = this.channels.get(obj.embed_channel_id);
+        this.verificationLevel = new VerificationLevel(obj.verification_level);
         switch (obj.default_message_notifications) {
             case 0:
                 this.defaultMessageNotifications = 'ALL MESSAGES';
@@ -99,4 +86,53 @@ module.exports = class Guild extends Object {
             user.status = presence.status;
         }
     }
-}
+
+    toString() {
+        return `${this.name}`;
+    }
+
+    toJSON() {
+        return JSON.stringify({
+            name: this.name,
+            region: this.region,
+            verification_level: this.verificationLevel.level,
+            afk_channel_id: this.afkChannel.id,
+            afk_timeout: this.afkTimeout,
+            system_channel_id: this.SystemChannelID
+        });
+    }
+
+    /**
+     * This applies any changes to the guild, it is recommended to change attributes with in the guild rather than passing parameters to this function.
+     * @param {object} obj Parameters to change, name, region, verification_level, afk_channel_id, afk_timeout, system_channel_id
+     */
+    async edit(obj) {
+        let guild = {
+            name: this.name,
+            region: this.region,
+            verification_level: this.verificationLevel.level,
+            afk_timeout: this.afkTimeout,
+            system_channel_id: this.SystemChannelID
+        };
+
+        if (obj) {
+            for (const [key, value] of Object.entries(obj)) {
+                guild[key] = value;
+            }
+        }
+
+        const b = await this.client.p({
+            url: `${this.client.baseURL}/guilds/${this.id}`,
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bot ${this.client.token}`,
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(guild)
+        });
+        if (b.statusCode === 204) {
+            return true;
+        }
+        throw new Error(`${b.body.code} ${b.body.message}`);
+    }
+};

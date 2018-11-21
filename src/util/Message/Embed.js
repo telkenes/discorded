@@ -1,26 +1,27 @@
-const colors = {
-    'BLUE': '#0000ff',
-    'RED': '#ff0000',
-    'YELLOW': '#ffff00',
-    'GREEN': '#00ff00',
-}
+const Color = require('../../models/Color.js');
 
 /**
  * Represents a Rich Embed.
  */
 class Embed {
-    constructor() { this.fields = []; }
+    constructor() {
+        this.fields = [];
+    }
 
     /**
      * Sets the title for the embed.
      * @param {string} str Title
      */
     title(str) {
-        if (!typeof str === 'string'){
+        if (!typeof str === 'string') {
             str = `${str}`;
         }
-        if (!str || str == '') throw new TypeError(`Message embed titles cannot be empty`);
-        if (str.split('').length > 256) throw new TypeError(`Message embed titles cannot be over 256 characters`);
+        if (!str || str == '')
+            throw new TypeError(`Message embed titles cannot be empty`);
+        if (str.split('').length > 256)
+            throw new TypeError(
+                `Message embed titles cannot be over 256 characters`
+            );
 
         this.title = `${str}`;
         return this;
@@ -31,11 +32,15 @@ class Embed {
      * @param {string} str Description
      */
     description(str) {
-        if (typeof str !== 'string'){
+        if (typeof str !== 'string') {
             str = `${str}`;
         }
-        if (!str || str == '') throw new TypeError(`Message embed descriptions cannot be empty`);
-        if (str.split('').length > 2048) throw new TypeError(`Message embed descriptions cannot be over 2048 characters`);
+        if (!str || str == '')
+            throw new TypeError(`Message embed descriptions cannot be empty`);
+        if (str.split('').length > 2048)
+            throw new TypeError(
+                `Message embed descriptions cannot be over 2048 characters`
+            );
 
         this.description = `${str}`;
         return this;
@@ -46,12 +51,17 @@ class Embed {
      * @param {hex} color Hex value for the color.
      */
     color(color) {
-        if (!color || color.length == 0) throw new TypeError(`Message embed colors must be a hex code, integer, or predefined code`);
+        // if (!color || color.length == 0 || !(color instanceof Color))
+        //     throw new TypeError(
+        //         `Message embed colors must be a hex code, integer or a discorded.Color`
+        //     );
 
-        if (!colors.hasOwnProperty(color)) {
+        if (typeof color === 'string') {
             this.color = parseInt(/[0-9A-F]{6}/i.exec(color)[0], 16);
-        } else {
-            this.color = parseInt(/[0-9A-F]{6}/i.exec(colors[color])[0], 16);
+        } else if (typeof color === 'string') {
+            this.color = color;
+        } else if (color instanceof Color) {
+            this.color = color.toString();
         }
 
         return this;
@@ -78,10 +88,12 @@ class Embed {
      * @param {boolean} inl Inline
      */
     field(name, value, inl) {
-        if (!name || name == '') throw new TypeError(`Message embed field names cannot be empty`);
-        if (!value || value == '') throw new TypeError(`Message embed field values cannot be empty`);
+        if (!name || name == '')
+            throw new TypeError(`Message embed field names cannot be empty`);
+        if (!value || value == '')
+            throw new TypeError(`Message embed field values cannot be empty`);
         let inline = false;
-        if (inl && typeof (inl) == 'boolean') inline = inl;
+        if (inl && typeof inl == 'boolean') inline = inl;
 
         this.fields.push({
             name: `${name}`,
@@ -98,16 +110,20 @@ class Embed {
      * @param {url} url URL
      */
     author(str, url) {
-        if (!str || str == '') throw new TypeError(`Message embed author name cannot be empty`);
-        if (str.split('').length > 256) throw new TypeError(`Message embed author name cannot be over 256 characters`);
+        if (!str || str == '')
+            throw new TypeError(`Message embed author name cannot be empty`);
+        if (str.split('').length > 256)
+            throw new TypeError(
+                `Message embed author name cannot be over 256 characters`
+            );
 
         let icon = null;
-        if (url && typeof (url) == 'string') icon = url;
+        if (url && typeof url == 'string') icon = url;
 
         this.author = {
             name: `${str}`,
             icon_url: icon
-        }
+        };
 
         return this;
     }
@@ -118,16 +134,20 @@ class Embed {
      * @param {url} url URL
      */
     footer(str, url) {
-        if (!str || str == '') throw new TypeError(`Message embed footer text cannot be empty`);
-        if (str.split('').length > 2048) throw new TypeError(`Message embed footer text cannot be over 2048 characters`);
+        if (!str || str == '')
+            throw new TypeError(`Message embed footer text cannot be empty`);
+        if (str.split('').length > 2048)
+            throw new TypeError(
+                `Message embed footer text cannot be over 2048 characters`
+            );
 
         let icon = null;
-        if (url && typeof (url) == 'string') icon = url;
+        if (url && typeof url == 'string') icon = url;
 
         this.footer = {
             text: `${str}`,
             icon_url: icon
-        }
+        };
 
         return this;
     }
@@ -137,7 +157,8 @@ class Embed {
      * @param {url} url URL
      */
     image(url) {
-        if (!url || url == '') throw new TypeError(`Message embed image URL is required`);
+        if (!url || url == '')
+            throw new TypeError(`Message embed image URL is required`);
 
         this.image = { url: url };
         return this;
@@ -148,7 +169,8 @@ class Embed {
      * @param {url} url URL
      */
     thumbnail(url) {
-        if (!url || url == '') throw new TypeError(`Message embed thumbnail URL is required`);
+        if (!url || url == '')
+            throw new TypeError(`Message embed thumbnail URL is required`);
 
         this.thumbnail = { url: url };
         return this;

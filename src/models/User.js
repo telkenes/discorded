@@ -2,7 +2,7 @@ const Object = require("./Object");
 const p = require('phin').promisified;
 
 module.exports = class User extends Object {
-    constructor(obj, client){
+    constructor(obj, client) {
         super(obj.id, client);
         this.id = obj.id;
         if (obj.username) this.username = obj.username;
@@ -19,21 +19,27 @@ module.exports = class User extends Object {
         if (obj.email) this.email = obj.email;
     }
 
-    toString(){
+    toString() {
         return `${this.username}#${this.discriminator}`
+    }
+
+    toJSON() {
+        JSON.stringify({
+            id: this.id
+        });
     }
 
     /**
      * Returns the username and the discriminator
      */
-    get tag(){
+    get tag() {
         return `${this.username}#${this.discriminator}`
     }
 
     /**
      * Returns the mention of the user. This can be used in messages or embeds.
      */
-    get mention(){
+    get mention() {
         return `<@${this.id}>`;
     }
 
@@ -50,7 +56,7 @@ module.exports = class User extends Object {
     /**
      * The username of the user.
      */
-    get name(){
+    get name() {
         return this.username;
     }
 
@@ -59,11 +65,11 @@ module.exports = class User extends Object {
      * @param {string} format Image format for the avatar
      * @param {number} size Size of the image, defaults to 1024
      */
-    avatarURLAs(format, size){
-        if (!format){
+    avatarURLAs(format, size) {
+        if (!format) {
             throw new Error("You need to give a format for the avatar url.");
         }
-        if (!size){
+        if (!size) {
             size = "1024";
         }
         size = String(size);

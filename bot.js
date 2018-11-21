@@ -1,11 +1,13 @@
 const discorded = require("./src/index");
 const meta = require("./commands/meta");
+const owner = require("./commands/owner");
 
 console.log(`Discorded version ${discorded.version}`);
 
 const client = new discorded.Client(require("./config.json").token, (client, msg) => ["dc ", "dc."]);
 
 client.loadCommands(meta);
+client.loadCommands(owner);
 
 client.on("commandError", (ctx, err) => {
     ctx.send("There was an error, try again later.\nError: " + err);

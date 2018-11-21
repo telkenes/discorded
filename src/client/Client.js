@@ -1,11 +1,11 @@
 const EventEmitter = require('events');
 const Store = require('../util/Store');
-const User = require("../models/User"),
-    Message = require("../models/Message"),
-    DMChannel = require("../models/DMChannel"),
-    Command = require("../models/Command"),
-    Context = require("../models/Context"),
-    Guild = require("../models/Guild");
+const User = require('../models/User'),
+    Message = require('../models/Message'),
+    DMChannel = require('../models/DMChannel'),
+    Command = require('../models/Command'),
+    Context = require('../models/Context'),
+    Guild = require('../models/Guild');
 const p = require('phin');
 
 class Client extends EventEmitter {
@@ -22,8 +22,8 @@ class Client extends EventEmitter {
         /**
          * Base url for discord api.
          */
-        this.baseURL = "https://discordapp.com/api";
-        
+        this.baseURL = 'https://discordapp.com/api';
+
         /**
          * This is for phin defaults.
          */
@@ -51,20 +51,28 @@ class Client extends EventEmitter {
          */
         this.commands = new Store();
 
-        this.commands.set("help", new Command("help", (client, ctx) => {
-            let commands = [];
-            this.commands.forEach(command => {
-                if (command.help){
-                    commands.push(`${command.name}\n   ${command.help}`);
-                } else {
-                    commands.push(`${command.name} - No help.`);
-                }
-            }, {
-                help: "Shows this message."
-            });
-            let format = commands.join("\n");
-            ctx.send("```\n" + format + "\n```");
-        }));
+        this.commands.set(
+            'help',
+            new Command('help', (client, ctx) => {
+                let commands = [];
+                this.commands.forEach(
+                    command => {
+                        if (command.help) {
+                            commands.push(
+                                `${command.name}\n   ${command.help}`
+                            );
+                        } else {
+                            commands.push(`${command.name} - No help.`);
+                        }
+                    },
+                    {
+                        help: 'Shows this message.'
+                    }
+                );
+                let format = commands.join('\n');
+                ctx.send('```\n' + format + '\n```');
+            })
+        );
 
         /**
          * The websocket that is used to connect to the gateway.
@@ -73,7 +81,7 @@ class Client extends EventEmitter {
             socket: null,
             connected: false,
             reconnect: {
-                state:false
+                state: false
             },
             gateway: {
                 url: null,
@@ -82,7 +90,7 @@ class Client extends EventEmitter {
                     interval: null,
                     last: null,
                     recieved: false,
-                    seq: null,
+                    seq: null
                 }
             }
         };
@@ -114,14 +122,18 @@ class Client extends EventEmitter {
         this.owner = null;
 
         if (!options) options = {};
-        if (typeof getPrefix === 'function' || typeof getPrefix === 'string' || getPrefix instanceof Array){
+        if (
+            typeof getPrefix === 'function' ||
+            typeof getPrefix === 'string' ||
+            getPrefix instanceof Array
+        ) {
             /**
              * Function that is used to get the prefix for commands.
              */
             this.getPrefix = getPrefix;
             options.useCommandHandler = true;
         } else {
-            if (typeof getPrefix === 'object'){
+            if (typeof getPrefix === 'object') {
                 options = getPrefix;
             }
             options.useCommandHandler = false;
@@ -132,7 +144,9 @@ class Client extends EventEmitter {
              * This allows the bots to invoke the built in command handler.
              */
             this.allowBots = true;
-            console.warn("Now allowed to respond to other bots. This can end up in a message loop.");
+            console.warn(
+                'Now allowed to respond to other bots. This can end up in a message loop.'
+            );
         } else {
             this.allowBots = false;
         }
@@ -142,12 +156,14 @@ class Client extends EventEmitter {
              * This means that the bot can reply to itself.
              */
             this.selfReply = true;
-            console.warn("Now allowed to respond to myself. This can end up in a message loop.");
+            console.warn(
+                'Now allowed to respond to myself. This can end up in a message loop.'
+            );
         } else {
             this.selfReply = false;
         }
 
-        if (options && options.useCommandHandler == true){
+        if (options && options.useCommandHandler == true) {
             this.useCommandHandler = true;
         } else {
             this.useCommandHandler = false;
@@ -166,25 +182,26 @@ class Client extends EventEmitter {
     connect() {
         this.p({
             url: `${this.baseURL}/oauth2/applications/@me`,
-            method:"GET",
+            method: 'GET',
             headers: {
-                'Authorization': `Bot ${this.token}`,
+                Authorization: `Bot ${this.token}`,
                 'Content-Type': 'application/json'
             }
         }).then(b => {
             this.owner = new User(b.body.owner, this);
         });
         const attemptLogin = require('../gateway/websocket');
-        if (this.ws.connected) throw new Error(`Client is already connected to the gateway`);
+        if (this.ws.connected)
+            throw new Error(`Client is already connected to the gateway`);
 
         attemptLogin(this);
     }
 
     /**
      * Returns a context from the message;
-     * @param {Message} mesage 
+     * @param {Message} mesage
      */
-    getContext(message){
+    getContext(message) {
         return new Context(message, this);
     }
 
@@ -198,7 +215,7 @@ class Client extends EventEmitter {
                 url: `${this.baseURL}/users/${id}`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bot ${this.token}`,
+                    Authorization: `Bot ${this.token}`,
                     'Content-Type': 'application/json'
                 }
             });
@@ -222,7 +239,7 @@ class Client extends EventEmitter {
      */
     loadCommands(commands) {
         if (!commands instanceof Array) {
-            throw new Error("The commands to load must be in a list.");
+            throw new Error('The commands to load must be in a list.');
         }
         for (const command of commands) {
             this.loadCommand(command);
@@ -246,13 +263,13 @@ class Client extends EventEmitter {
      */
     async sendMessage(channelID, payload, ctx) {
         let channel = this.channels.get(channelID);
-        if (!channel){
+        if (!channel) {
             const b = await this.p({
                 url: `${this.baseURL}/users/@me/channels`,
-                method:"POST",
-                headers:{
-                    "Authorization": `Bot ${this.token}`,
-                    "Content-Type": "application/json"
+                method: 'POST',
+                headers: {
+                    Authorization: `Bot ${this.token}`,
+                    'Content-Type': 'application/json'
                 },
                 data: JSON.stringify({
                     recipient_id: channelID
@@ -263,27 +280,35 @@ class Client extends EventEmitter {
         }
         const b = await this.p({
             url: `${this.baseURL}/channels/${channel.id}/messages`,
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Authorization": `Bot ${this.token}`,
+                Authorization: `Bot ${this.token}`,
                 'Content-Type': 'application/json'
             },
             data: payload
         });
-        if (b.body.code){
-            if (ctx){
-                this.emit("commandError", ctx, b.body.message);
+        if (b.body.code) {
+            if (ctx) {
+                this.emit('commandError', ctx, b.body.message);
             }
         } else {
-            if (channel.guild){
-                return new Message(b.body, {
-                    guild: channel.guild,
-                    channel: channel
-                }, this);
+            if (channel.guild) {
+                return new Message(
+                    b.body,
+                    {
+                        guild: channel.guild,
+                        channel: channel
+                    },
+                    this
+                );
             } else {
-                return new Message(b.body, {
-                    channel: channel
-                }, this);
+                return new Message(
+                    b.body,
+                    {
+                        channel: channel
+                    },
+                    this
+                );
             }
         }
     }
@@ -298,11 +323,9 @@ class Client extends EventEmitter {
             url: `${this.baseURL}/channels/${channelID}/messages/${messageID}`,
             method: 'DELETE',
             headers: {
-                'Authorization': `Bot ${this.token}`,
+                Authorization: `Bot ${this.token}`,
                 'Content-Type': 'application/json'
-            },
-            data: payload,
-            parse: "json"
+            }
         });
 
         return b.body;
@@ -319,13 +342,13 @@ class Client extends EventEmitter {
         const channel = this.channels.get(channelID);
         const b = await p({
             url: `${this.baseURL}/channels/${channelID}/messages/${messageID}`,
-            method: "PATCH",
+            method: 'PATCH',
             headers: {
-                "Authorization": `Bot ${this.token}`,
+                Authorization: `Bot ${this.token}`,
                 'Content-Type': 'application/json'
             },
             data: payload,
-            parse:'json'
+            parse: 'json'
         });
         return new Message(b.body, {
             guild: channel.guild,
@@ -339,17 +362,17 @@ class Client extends EventEmitter {
      * @returns {Channel} The channel that was edited.
      */
     async editChannel(channel) {
-            const b = await p({
-                url: `${this.baseURL}/channels/${channel.id}`,
-                method: "PATCH",
-                headers: {
-                    "Authorization": `Bot ${this.token}`,
-                    "Content-Type": "application/json"
-                },
-                data: channel.toJSON(),
-                parse:'json'
-            });
-            return channel;
+        const b = await p({
+            url: `${this.baseURL}/channels/${channel.id}`,
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                'Content-Type': 'application/json'
+            },
+            data: channel.toJSON(),
+            parse: 'json'
+        });
+        return channel;
     }
 
     /**
@@ -359,49 +382,57 @@ class Client extends EventEmitter {
     async processCommands(ctx) {
         if (ctx.author.id === this.user.id && !this.selfReply) return;
         let prefixes;
-        if (typeof this.getPrefix == 'function'){
+        if (typeof this.getPrefix == 'function') {
             prefixes = this.getPrefix(this, ctx.message);
         } else {
             prefixes = this.getPrefix;
         }
         let prefix = null;
-        if (typeof (prefixes) == 'string') {
+        if (typeof prefixes == 'string') {
             if (ctx.message.content.startsWith(prefixes)) prefix = prefixes;
         } else if (prefixes instanceof Array) {
             for (let pre of prefixes) {
                 if (ctx.message.content.startsWith(pre)) {
                     prefix = pre;
                     break;
-                };
+                }
             }
         }
         if (prefix === null) return;
         if (ctx.author.bot && !this.allowBots) return;
-        const command = this.commands.get(ctx.message.content.slice(prefix.length).split(" ")[0]);
+        const command = this.commands.get(
+            ctx.message.content.slice(prefix.length).split(' ')[0]
+        );
         if (!command) return;
-        if (command.ownerOnly && ctx.author.id !== this.owner.id){
-            return this.emit("notOwner", ctx);
+        if (command.ownerOnly && ctx.author.id !== this.owner.id) {
+            return this.emit('notOwner', ctx);
         }
         if (command.checks) {
             for (const check of command.checks) {
                 if (!check(ctx)) {
-                    return this.emit("checkError", ctx);
+                    return this.emit('checkError', ctx);
                 }
             }
         }
         if (command.nsfw && !ctx.channel.nsfw) {
-            return this.emit("notNSFW", ctx);
+            return this.emit('notNSFW', ctx);
         }
         ctx.command = command;
-        ctx.argString = ctx.message.content.slice(prefix.length + command.name.length + 1);
-        ctx.args = ctx.argString.split(" ");
-        ctx.args.shift();
+        if (ctx.message.content) {
+            ctx.argString = ctx.message.content.slice(
+                prefix.length + command.name.length + 1
+            );
+            ctx.args = ctx.argString.split(' ');
+        } else {
+            ctx.argString = '';
+            ctx.args = [];
+        }
         this.emit('command', ctx);
         try {
-            console.log("Processing command for " + ctx.author.toString())
+            console.log('Processing command for ' + ctx.author.toString());
             command.run(this, ctx);
         } catch (err) {
-            this.emit("commandError", err);
+            this.emit('commandError', err);
         }
     }
 }

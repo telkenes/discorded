@@ -1,15 +1,16 @@
-const Object = require("./Object");
-const Permissions = require("../util/Permissions");
+const Object = require('./Object'),
+    Permissions = require('../util/Permissions'),
+    Color = require('./Color');
 
 /**
  * Represents a {@link Guild} Role
  * @extends {Object}
  */
-class Role extends Object{
-    constructor (obj, client){
+class Role extends Object {
+    constructor(obj, client) {
         super(obj.id, client);
         this.name = obj.name;
-        this.color = obj.color;
+        this.color = new Color(obj.color);
         this.hoist = obj.hoist;
         this.position = obj.position;
         this.permissions = new Permissions(obj.permissions);
@@ -20,7 +21,7 @@ class Role extends Object{
     /**
      * Returns the role mention, this can be used at messages or embeds.
      */
-    get mention(){
+    get mention() {
         return `<@&${this.id}>`;
     }
 }

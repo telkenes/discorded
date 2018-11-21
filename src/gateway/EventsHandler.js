@@ -170,7 +170,7 @@ module.exports = {
         let obj = d.d;
 
         let channels = new Store();
-        for (let channel of d.d.channels) {
+        for (let channel of obj.channels) {
             switch (channel.type) {
                 case 0:
                     channel = new TextChannel(channel, client);
