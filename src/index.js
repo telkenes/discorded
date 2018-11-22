@@ -1,7 +1,7 @@
 // Inspiration for this module was gotten from discord.py 😅 Don't ask how.
 
 module.exports = {
-    version: '0.0.2dev',
+    version: '0.0.3dev',
     Client: require('./client/Client'),
 
     // Classes

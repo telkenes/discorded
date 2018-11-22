@@ -11,10 +11,9 @@ const p = require('phin');
 class Client extends EventEmitter {
     /**
      * Represents a discord user/bot
-     * @todo Make it so that you can use it without using the command handler
-     * @param {function|string|Array} getPrefix This is used to get the prefix for the built in command handler. It passes the client and the message as arguments.
      * @param {string} token The token used for authentication.
-     * @param {object} options Other options
+     * @param {function|string|Array} getPrefix OPTIONAL This is used to get the prefix for the built in command handler. It passes the client and the message as arguments.
+     * @param {object} options OPTIONAL Other options
      */
     constructor(token, getPrefix, options) {
         super();
