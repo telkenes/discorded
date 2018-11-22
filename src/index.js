@@ -1,8 +1,9 @@
 // Inspiration for this module was gotten from discord.py 😅 Don't ask how.
 
 module.exports = {
-    version: '0.0.3dev',
+    version: '0.0.5dev',
     Client: require('./client/Client'),
+    client: require('./client/Client'),
 
     // Classes
     Activity: require('./models/Activity'),
